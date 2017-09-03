@@ -2,6 +2,7 @@
 
 import os
 import requests
+import hashlib
 
 
 class virtual_host_scanner(object):
@@ -61,7 +62,10 @@ class virtual_host_scanner(object):
             if self.ignore_content_length > 0 and self.ignore_content_length == int(res.headers.get('content-length')):
                 continue
 
-            output = 'Found: {} (code: {}, length: {})'.format(hostname, res.status_code, res.headers.get('content-length'))
+            # hash the page to allow us to find outlining results easier
+            page_hash = hashlib.sha256(res.text.encode('utf-8')).hexdigest()
+
+            output = 'Found: {} (code: {}, length: {}, hash: {})'.format(hostname, res.status_code, res.headers.get('content-length'), page_hash)
             results += output + '\n'
             
             print(output)
